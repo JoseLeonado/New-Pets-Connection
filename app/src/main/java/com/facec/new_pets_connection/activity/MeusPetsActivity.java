@@ -1,5 +1,6 @@
 package com.facec.new_pets_connection.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,7 +26,7 @@ public class MeusPetsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            
+                startActivity(new Intent(getApplicationContext(), CadastrarPetActivity.class));
             }
         });
     }

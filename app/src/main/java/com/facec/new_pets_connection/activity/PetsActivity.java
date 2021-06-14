@@ -45,7 +45,7 @@ public class PetsActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.menu_pets:
-                startActivity(new Intent());
+                startActivity(new Intent(getApplicationContext(), MeusPetsActivity.class));
                 break;
             case R.id.menu_sair:
                 autenticacao.signOut();
