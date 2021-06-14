@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.facec.new_pets_connection.activity.CadastroActivity;
+import com.facec.new_pets_connection.activity.LoginActivity;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide;
 
@@ -40,10 +42,10 @@ public class MainActivity extends IntroActivity {
     }
 
     public void btnCadastrar(View view) {
-
+        startActivity(new Intent(this, CadastroActivity.class));
     }
 
     public void btnEntrar(View view) {
-        //startActivity(new Intent(this, ));
+        startActivity(new Intent(this, LoginActivity.class));
     }
 }
