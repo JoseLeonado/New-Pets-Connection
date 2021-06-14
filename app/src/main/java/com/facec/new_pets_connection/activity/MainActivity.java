@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.facec.new_pets_connection.R;
-import com.facec.new_pets_connection.activity.CadastroActivity;
-import com.facec.new_pets_connection.activity.LoginActivity;
+import com.facec.new_pets_connection.config.FirebaseConfig;
+import com.google.firebase.auth.FirebaseAuth;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide;
 
 public class MainActivity extends IntroActivity {
+
+    private FirebaseAuth autenticacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +44,31 @@ public class MainActivity extends IntroActivity {
                 .build());
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        verificarUsuarioLogado();
+    }
+
     public void btnCadastrar(View view) {
         startActivity(new Intent(this, CadastroActivity.class));
     }
 
     public void btnEntrar(View view) {
         startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    public void verificarUsuarioLogado() {
+
+        autenticacao = FirebaseConfig.getFirebaseAutenticacao();
+
+        if (autenticacao.getCurrentUser() != null) {
+            abrirTelaPrincipal();
+        }
+
+    }
+
+    public void abrirTelaPrincipal() {
+        startActivity(new Intent(this, PetsActivity.class));
     }
 }
