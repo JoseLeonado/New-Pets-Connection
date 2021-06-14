@@ -1,9 +1,10 @@
-package com.facec.new_pets_connection;
+package com.facec.new_pets_connection.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.facec.new_pets_connection.R;
 import com.facec.new_pets_connection.activity.CadastroActivity;
 import com.facec.new_pets_connection.activity.LoginActivity;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
