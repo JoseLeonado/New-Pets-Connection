@@ -87,6 +87,8 @@ public class PetsActivity extends AppCompatActivity {
 
         );
 
+        getSupportActionBar().setTitle("Pets para adoção");
+
     }
 
     public void recuperarPetsPublicos() {

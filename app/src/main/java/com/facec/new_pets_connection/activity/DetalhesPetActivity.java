@@ -30,9 +30,6 @@ public class DetalhesPetActivity<Anuncio> extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhes_pet);
 
-        //Configurar toolbar
-        getSupportActionBar().setTitle("Detalhe pet");
-
         //Incializar componentes de interface
         inicializarComponentes();
 
@@ -60,6 +57,9 @@ public class DetalhesPetActivity<Anuncio> extends AppCompatActivity {
             carouselView.setImageListener( imageListener );
 
         }
+
+        //Configurar toolbar
+        getSupportActionBar().setTitle("Detalhes do pet");
 
     }
 

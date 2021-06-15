@@ -66,6 +66,7 @@ public class MeusPetsActivity extends AppCompatActivity {
 
         recuperarPets();
 
+        getSupportActionBar().setTitle("Meus pets cadastrados");
 
     }
 
