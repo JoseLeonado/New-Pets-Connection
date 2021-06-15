@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.facec.new_pets_connection">
-
     <!-- Permissões internet -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Permissões galeria/camera -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Permissões galeria/camera -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
 
     <application
         android:allowBackup="true"
@@ -19,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NewPetsConnection"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity.CadastrarPetActivity"></activity>
+        <activity android:name=".activity.DetalhesPetActivity"></activity>
+        <activity android:name=".activity.CadastrarPetActivity" />
         <activity
             android:name=".activity.MeusPetsActivity"
             android:label="@string/title_activity_main2"

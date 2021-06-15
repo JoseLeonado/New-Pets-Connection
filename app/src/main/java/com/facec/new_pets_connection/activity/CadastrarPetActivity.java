@@ -2,11 +2,11 @@ package com.facec.new_pets_connection.activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +14,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,28 +22,47 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.facec.new_pets_connection.R;
+import com.facec.new_pets_connection.config.FirebaseConfig;
 import com.facec.new_pets_connection.config.Permissoes;
+import com.facec.new_pets_connection.model.Pet;
+import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import dmax.dialog.SpotsDialog;
 
 public class CadastrarPetActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView img1, img2, img3;
     private EditText campoNome, campoIdade, campoSexo, campoRaca, campoVacina, campoEndereco;
     private Button botaoCadastrar;
+    private Pet pet;
+    private StorageReference storage;
+    private AlertDialog dialog;
 
     private String[] permissoes = new String[] {
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
 
     private List<String> listaFotosRecuperada = new ArrayList<>();
+    private List<String> listaURLFireBaseFotos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastrar_pet);
+
+        storage = FirebaseConfig.getFirebaseStorage();
 
         //Validar permissões
         Permissoes.validarPermissoes(permissoes, this, 1);
@@ -50,7 +70,76 @@ public class CadastrarPetActivity extends AppCompatActivity implements View.OnCl
         inicializarComponentes();
     }
 
-    public void validarDadosPet(View view) {
+
+    public void salvarPet() {
+
+        dialog = new SpotsDialog.Builder()
+                .setContext(this)
+                .setMessage("Salvando Pet...")
+                .setCancelable(false)
+                .build();
+        dialog.show();
+
+        //Salvar as imgs no storage
+        for (int i = 0;  i < listaFotosRecuperada.size(); i++) {
+
+            String urlImg = listaFotosRecuperada.get(i);
+            int tamnhoDaLista = listaFotosRecuperada.size();
+            salvarFotoStorage(urlImg, tamnhoDaLista, i);
+
+        }
+    }
+
+    private void salvarFotoStorage (String urlString, int totalDeFotos, int contador) {
+
+        //Criar nó no Storage
+        StorageReference imgPet = storage.child("imgs")
+                .child("pets")
+                .child(pet.getId())
+                .child("img" + contador);
+
+        //Fazer upload
+        String nomeDoArquivo = UUID.randomUUID().toString();
+        final StorageReference imgRef = imgPet.child(nomeDoArquivo + ".jpeg");
+
+        UploadTask uploadTask = imgRef.putFile(Uri.parse(urlString));
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                imgRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+
+                        Uri url = task.getResult();
+                        String urlConvertida = url.toString();
+
+                        listaURLFireBaseFotos.add(urlConvertida);
+
+                        if (totalDeFotos == listaURLFireBaseFotos.size()) {
+                            pet.setFotos(listaURLFireBaseFotos);
+                            pet.salvar();
+
+                            dialog.dismiss();
+                            finish();
+                        }
+
+                    }
+                });
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                exibirMsgDeErro("Falha ao fazer upload");
+                Log.i("INFO", "Falha ao fazer upload: " + e.getMessage());
+            }
+        });
+
+    }
+
+    private Pet configurarPet() {
 
         String nome = campoNome.getText().toString();
         String idade = campoIdade.getText().toString();
@@ -59,14 +148,30 @@ public class CadastrarPetActivity extends AppCompatActivity implements View.OnCl
         String vacina = campoVacina.getText().toString();
         String endereco = campoEndereco.getText().toString();
 
-        if (listaFotosRecuperada.size() != 0) {
-            if (!nome.isEmpty()) {
-                if (!idade.isEmpty()) {
-                    if (!sexo.isEmpty()) {
-                        if (!raca.isEmpty()) {
-                            if (!vacina.isEmpty()) {
-                                if (!endereco.isEmpty()) {
 
+        Pet pet = new Pet();
+        pet.setNome(nome);
+        pet.setIdade(idade);
+        pet.setSexo(sexo);
+        pet.setRaca(raca);
+        pet.setVacina(vacina);
+        pet.setEndereco(endereco);
+
+        return pet;
+    }
+
+    public void validarDadosPet(View view) {
+
+        pet = configurarPet();
+
+        if (listaFotosRecuperada.size() != 0) {
+            if (!pet.getNome().isEmpty()) {
+                if (!pet.getIdade().isEmpty()) {
+                    if (!pet.getSexo().isEmpty()) {
+                        if (!pet.getRaca().isEmpty()) {
+                            if (!pet.getVacina().isEmpty()) {
+                                if (!pet.getEndereco().isEmpty()) {
+                                    salvarPet();
                                 } else {
                                     exibirMsgDeErro("Preencha o campo endereco");
                                 }
@@ -94,10 +199,6 @@ public class CadastrarPetActivity extends AppCompatActivity implements View.OnCl
 
     private void exibirMsgDeErro(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    public void salvarPet() {
-
     }
 
     @Override
